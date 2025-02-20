@@ -1,0 +1,64 @@
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - "config/initializers/devise.rb"
+
+# Disable frozen string literal comment check
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/GlobalStdStream:
+  Enabled: false
+
+Style/RedundantFetchBlock:
+  Enabled: false
+
+# Exclude some generated or unnecessary files
+AllCops:
+  NewCops: enable
+  Exclude:
+    - "bin/*"
+    - "db/schema.rb"
+    - "node_modules/**/*"
+    - "vendor/**/*"
+
+# Enforce consistent indentation
+Layout/IndentationWidth:
+  Width: 2
+
+# Prefer single quotes for strings unless interpolation is needed
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+  Exclude:
+    - "config/initializers/devise.rb" # Exclude Devise configuration
+
+# Ensure trailing whitespace is removed
+Layout/TrailingWhitespace:
+  Enabled: true
+
+# Force newlines at end of files
+Layout/TrailingEmptyLines:
+  Enabled: true
+
+# Allow long method chains to improve readability
+Layout/DotPosition:
+  EnforcedStyle: leading
+
+# Enable auto-correct for common issues
+Lint/UselessAssignment:
+  AutoCorrect: true
+
+Style/Documentation:
+  Enabled: false # Disable requirement for class/module documentation
+
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/BlockLength:
+  Max: 30
