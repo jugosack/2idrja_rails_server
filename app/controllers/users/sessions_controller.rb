@@ -1,6 +1,9 @@
 class Users::SessionsController < Devise::SessionsController
   include RackSessionFix
+  before_action :authenticate_user_from_token!, only: [:destroy]
+
   skip_before_action :verify_authenticity_token
+  skip_before_action :authenticate_user_from_token!, only: [:create]  # Skip authentication for login
 
   respond_to :json
 
@@ -22,20 +25,50 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   def respond_to_on_destroy
-    if current_user
-      render json: {
-        status: 200,
-        message: 'Logged out successfully'
-      }, status: :ok
+    auth_header = request.headers['Authorization']
+    if auth_header.blank?
+      Rails.logger.error "Authorization header missing"
+      return render json: { status: 401, message: 'Authorization header missing' }, status: :unauthorized
+    end
+  
+    token = auth_header.split(' ').last
+    decoded_token = decode_jwt_token(token)
+  
+    if decoded_token.nil?
+      return render json: { status: 401, message: 'Invalid token' }, status: :unauthorized
+    end
+  
+    user_id = decoded_token[0]['sub']
+    user = User.find_by(id: user_id)
+  
+    if user
+      user.update(jti: SecureRandom.uuid)  # Invalidate the token
+      render json: { status: 200, message: 'Logged out successfully' }, status: :ok
     else
-      render json: {
-        status: 401,
-        message: "Couldn't find an active session."
-      }, status: :unauthorized
+      render json: { status: 401, message: "Couldn't find an active session." }, status: :unauthorized
     end
   end
-
+  
   def generate_jwt_token(user)
-    JWT.encode({ user_id: user.id, exp: 24.hours.from_now.to_i }, Rails.application.secrets.secret_key_base)
+    payload = {
+      'sub' => user.id,  # Use 'sub' as the key
+      'jti' => user.jti,
+      'exp' => 24.hours.from_now.to_i
+    }
+    Rails.logger.info "Generated Token Payload: #{payload}"
+    JWT.encode(payload, Rails.application.credentials.fetch(:secret_key_base), 'HS256')
+  end
+
+  # Reuse the decode_jwt_token method from ApplicationController
+  def decode_jwt_token(token)
+    secret_key = Rails.application.credentials.fetch(:secret_key_base)
+    algorithm = 'HS256'
+
+    begin
+      JWT.decode(token, secret_key, true, algorithm: algorithm)
+    rescue JWT::DecodeError => e
+      Rails.logger.error "JWT Decode Error: #{e.message}"
+      nil
+    end
   end
 end
