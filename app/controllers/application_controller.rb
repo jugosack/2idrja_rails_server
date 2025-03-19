@@ -18,18 +18,18 @@ class ApplicationController < ActionController::Base
   def authenticate_user_from_token!
     auth_header = request.headers['Authorization']
     if auth_header.present?
-      token = auth_header.split(' ').last
+      token = auth_header.split.last
       decoded_token = decode_jwt_token(token)
-  
+
       if decoded_token
         Rails.logger.info "Decoded Token: #{decoded_token}"
-        user_id = decoded_token[0]['sub']  # Extract user ID using 'sub'
+        user_id = decoded_token[0]['sub'] # Extract user ID using 'sub'
         Rails.logger.info "Extracted User ID: #{user_id}"
         @current_user = User.find_by(id: user_id)
-        Rails.logger.info "Current User in authenticate_user_from_token!: #{@current_user.inspect}"  # Log the current user
+        Rails.logger.info "Current User in authenticate_user_from_token!: #{@current_user.inspect}" # Log the current user
       end
     end
-  
+
     # Render unauthorized if no valid user is found
     render json: { error: 'Unauthorized' }, status: :unauthorized unless @current_user
   end

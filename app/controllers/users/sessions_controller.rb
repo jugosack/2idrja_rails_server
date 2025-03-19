@@ -3,7 +3,7 @@ class Users::SessionsController < Devise::SessionsController
   before_action :authenticate_user_from_token!, only: [:destroy]
 
   skip_before_action :verify_authenticity_token
-  skip_before_action :authenticate_user_from_token!, only: [:create]  # Skip authentication for login
+  skip_before_action :authenticate_user_from_token!, only: [:create] # Skip authentication for login
 
   respond_to :json
 
@@ -27,31 +27,31 @@ class Users::SessionsController < Devise::SessionsController
   def respond_to_on_destroy
     auth_header = request.headers['Authorization']
     if auth_header.blank?
-      Rails.logger.error "Authorization header missing"
+      Rails.logger.error 'Authorization header missing'
       return render json: { status: 401, message: 'Authorization header missing' }, status: :unauthorized
     end
-  
-    token = auth_header.split(' ').last
+
+    token = auth_header.split.last
     decoded_token = decode_jwt_token(token)
-  
-    if decoded_token.nil?
+
+    if decoded_token.nil? # rubocop:disable Style/IfUnlessModifier
       return render json: { status: 401, message: 'Invalid token' }, status: :unauthorized
     end
-  
+
     user_id = decoded_token[0]['sub']
     user = User.find_by(id: user_id)
-  
+
     if user
-      user.update(jti: SecureRandom.uuid)  # Invalidate the token
+      user.update(jti: SecureRandom.uuid) # Invalidate the token
       render json: { status: 200, message: 'Logged out successfully' }, status: :ok
     else
       render json: { status: 401, message: "Couldn't find an active session." }, status: :unauthorized
     end
   end
-  
+
   def generate_jwt_token(user)
     payload = {
-      'sub' => user.id,  # Use 'sub' as the key
+      'sub' => user.id, # Use 'sub' as the key
       'jti' => user.jti,
       'exp' => 24.hours.from_now.to_i
     }
