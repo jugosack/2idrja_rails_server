@@ -51,9 +51,10 @@ class Users::SessionsController < Devise::SessionsController
 
   def generate_jwt_token(user)
     payload = {
-      'sub' => user.id, # Use 'sub' as the key
-      'jti' => user.jti,
-      'exp' => 24.hours.from_now.to_i
+      sub: user.id, # Symbol key
+      jti: user.jti,       # Required for revocation
+      exp: 24.hours.from_now.to_i,
+      scp: 'user'          # Required by warden-jwt_auth
     }
     Rails.logger.info "Generated Token Payload: #{payload}"
     JWT.encode(payload, Rails.application.credentials.fetch(:secret_key_base), 'HS256')
