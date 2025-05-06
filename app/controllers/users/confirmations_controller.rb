@@ -1,5 +1,7 @@
 # app/controllers/users/confirmations_controller.rb
 class Users::ConfirmationsController < Devise::ConfirmationsController
+  skip_before_action :authenticate_user_from_token!, only: [:show]
+
   # Dodavanje show akcije koja samo preusmerava na željeni URL
   def show
     self.resource = resource_class.confirm_by_token(params[:confirmation_token])
