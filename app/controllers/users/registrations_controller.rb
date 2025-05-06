@@ -1,6 +1,8 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   include RackSessionFix
   skip_before_action :verify_authenticity_token
+  skip_before_action :authenticate_user_from_token!, only: [:create]
+
   respond_to :json
 
   private
