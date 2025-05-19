@@ -10,5 +10,5 @@ class User < ApplicationRecord
   validates :mobile_number, presence: true
   validates :terms_of_use, acceptance: true
 
-  attr_accessor :unconfirmed_email
+  # attr_accessor :unconfirmed_email
 end
