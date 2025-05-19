@@ -7,6 +7,34 @@ class Users::SessionsController < Devise::SessionsController
 
   respond_to :json
 
+  def create
+    user = User.find_by(email: params[:user][:email]&.downcase)
+
+    if user.nil?
+      Rails.logger.info "Login failed: user not found" # rubocop:disable Style/StringLiterals
+      return render json: {
+        status: { code: 401, message: 'Invalid email or password' }
+      }, status: :unauthorized
+    end
+
+    unless user.valid_password?(params[:user][:password])
+      Rails.logger.info "Login failed: invalid password for #{user.email}"
+      return render json: {
+        status: { code: 401, message: 'Invalid email or password' }
+      }, status: :unauthorized
+    end
+
+    unless user.confirmed?
+      Rails.logger.info "Login blocked: email not confirmed for #{user.email}"
+      return render json: {
+        status: { code: 401, message: 'You must confirm your email address before logging in.' }
+      }, status: :unauthorized
+    end
+
+    sign_in(user)
+    respond_with(user)
+  end
+
   private
 
   def respond_with(resource, _opts = {})
