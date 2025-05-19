@@ -19,14 +19,13 @@ class Users::ConfirmationsController < Devise::ConfirmationsController
     self.resource = resource_class.confirm_by_token(params[:confirmation_token])
     yield resource if block_given?
     if resource.errors.empty?
-      redirect_to 'http://localhost:3001/login'
+      redirect_to 'http://localhost:3001/login' # rubocop:disable Style/IdenticalConditionalBranches
     else
       # Instead of respond_with_navigational try this:
       flash[:alert] = resource.errors.full_messages.join(', ')
-      redirect_to 'http://localhost:3001/login' # or some error page
+      redirect_to 'http://localhost:3001/login' # rubocop:disable Style/IdenticalConditionalBranches
     end
   end
-  
 
   private
 
