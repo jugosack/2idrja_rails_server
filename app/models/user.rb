@@ -11,5 +11,4 @@ class User < ApplicationRecord
   validates :terms_of_use, acceptance: true
 
   # attr_accessor :unconfirmed_email
-  
 end

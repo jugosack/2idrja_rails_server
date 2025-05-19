@@ -55,7 +55,7 @@ Style/Documentation:
   Enabled: false # Disable requirement for class/module documentation
 
 Metrics/MethodLength:
-  Max: 20
+  Max: 30
 
 Metrics/ClassLength:
   Max: 200

@@ -12,9 +12,7 @@ Rails.application.routes.draw do
                        registrations: 'users/registrations',
                        confirmations: 'users/confirmations'
                      }
-                    
-put 'change_password', to: 'passwords#update'
-put '/edit_user', to: 'users#update'
 
+  put 'change_password', to: 'passwords#update'
+  put '/edit_user', to: 'users#update'
 end
-
