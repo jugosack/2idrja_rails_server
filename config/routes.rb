@@ -14,5 +14,7 @@ Rails.application.routes.draw do
                      }
                     
 put 'change_password', to: 'passwords#update'
+put '/edit_user', to: 'users#update'
+
 end
 
