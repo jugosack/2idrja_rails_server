@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  skip_before_action :verify_authenticity_token, only: [:update, :upload_avatar]
+  skip_before_action :verify_authenticity_token, only: [:update, :upload_avatar] # rubocop:disable Style/SymbolArray
 
   def upload_avatar
     if params[:avatar].present?
@@ -38,7 +38,7 @@ class UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(
-      :first_name, :last_name, :country, :email, :mobile_number 
+      :first_name, :last_name, :country, :email, :mobile_number
     )
   end
 end

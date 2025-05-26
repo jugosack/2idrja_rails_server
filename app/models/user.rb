@@ -12,5 +12,4 @@ class User < ApplicationRecord
 
   # attr_accessor :unconfirmed_email
   has_one_attached :avatar
-
 end
