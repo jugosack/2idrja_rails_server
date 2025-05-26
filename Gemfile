@@ -50,6 +50,8 @@ gem 'devise'
 gem 'devise-jwt'
 gem 'jsonapi-serializer'
 
+gem 'ruby-vips', require: false
+
 # Use Sass to process CSS
 # gem "sassc-rails"
 

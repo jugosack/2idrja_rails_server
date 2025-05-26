@@ -11,4 +11,6 @@ class User < ApplicationRecord
   validates :terms_of_use, acceptance: true
 
   # attr_accessor :unconfirmed_email
+  has_one_attached :avatar
+
 end
