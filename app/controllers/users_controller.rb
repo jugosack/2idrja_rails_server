@@ -25,7 +25,7 @@ class UsersController < ApplicationController
       render json: {
         message: 'User updated successfully',
         user: current_user.as_json(only: [
-                                     :id, :first_name, :last_name, :email, :country, :mobile_number, :unconfirmed_email
+                                     :id, :first_name, :last_name, :email, :country, :mobile_number, :unconfirmed_email, :role
                                    ])
       }, status: :ok
     else
