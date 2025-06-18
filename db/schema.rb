@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_05_24_082024) do
+ActiveRecord::Schema[7.0].define(version: 2025_06_17_053903) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,6 +42,26 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_24_082024) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "courses", force: :cascade do |t|
+    t.string "course_name", null: false
+    t.date "start_date"
+    t.date "end_date"
+    t.text "description"
+    t.text "benefits"
+    t.text "target_audience"
+    t.text "additional_info"
+    t.decimal "fee", precision: 10, scale: 2
+    t.integer "max_students"
+    t.integer "enrolled_students", default: 0
+    t.integer "places_left"
+    t.string "course_status"
+    t.float "rating"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_courses_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -60,6 +80,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_24_082024) do
     t.string "mobile_number"
     t.boolean "terms_of_use"
     t.string "jti", null: false
+    t.string "role", default: "user"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
@@ -68,4 +89,5 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_24_082024) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "courses", "users"
 end
