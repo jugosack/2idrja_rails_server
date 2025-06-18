@@ -16,4 +16,10 @@ Rails.application.routes.draw do
   put 'change_password', to: 'passwords#update'
   put '/edit_user', to: 'users#update'
   post '/upload_avatar', to: 'users#upload_avatar'
+
+  resources :courses do
+    member do
+      patch :upload_image  # matches controller action name and HTTP verb
+    end
+  end
 end

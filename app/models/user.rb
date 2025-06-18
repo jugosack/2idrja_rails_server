@@ -12,4 +12,15 @@ class User < ApplicationRecord
 
   # attr_accessor :unconfirmed_email
   has_one_attached :avatar
+  has_many :courses
+
+  enum role: { user: 'user', admin: 'admin' }
+
+  before_validation :set_default_role, on: :create
+
+  private
+
+  def set_default_role
+    self.role ||= 'user'
+  end
 end
