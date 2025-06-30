@@ -3,6 +3,7 @@ class Course < ApplicationRecord
   has_one_attached :image, dependent: :purge_later
   # Validations
   validates :course_name, presence: true
+  validates :general_description, presence: true
   validates :fee, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :max_students, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validates :enrolled_students, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
