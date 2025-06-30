@@ -87,7 +87,7 @@ class CoursesController < ApplicationController
     params.require(:course).permit(
       :course_name, :start_date, :end_date, :description,
       :benefits, :target_audience, :additional_info, :fee,
-      :max_students, :enrolled_students, :course_status, :rating
+      :max_students, :enrolled_students, :course_status, :rating, :general_description
     )
   end
 end
