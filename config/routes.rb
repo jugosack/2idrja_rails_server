@@ -22,4 +22,5 @@ Rails.application.routes.draw do
       patch :upload_image  # matches controller action name and HTTP verb
     end
   end
+  resources :instructors, only: %i[index show create update destroy]
 end
