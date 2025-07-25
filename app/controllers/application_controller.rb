@@ -53,5 +53,9 @@ class ApplicationController < ActionController::Base
   end
 
   # Expose current_user to controllers
-  attr_reader :current_user
+  # Make sure to override Devise's current_user method
+  def current_user
+    @current_user || super
+  end
+  helper_method :current_user
 end
