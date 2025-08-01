@@ -17,6 +17,12 @@ Rails.application.routes.draw do
   put '/edit_user', to: 'users#update'
   post '/upload_avatar', to: 'users#upload_avatar'
 
+  post '/create_user', to: 'users#create'
+  get '/users', to: 'users#index'
+  delete '/users/:id', to: 'users#destroy'
+  put '/admin/users/:id', to: 'users#admin_update'
+
+
   resources :courses do
     member do
       patch :upload_image  # matches controller action name and HTTP verb
