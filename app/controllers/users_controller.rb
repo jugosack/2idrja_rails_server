@@ -1,6 +1,6 @@
 # class UsersController < ApplicationController
 #   before_action :authenticate_user!
-#   skip_before_action :verify_authenticity_token, only: [:update, :upload_avatar] # rubocop:disable Style/SymbolArray
+#   skip_before_action :verify_authenticity_token, only: [:update, :upload_avatar]
 
 #   def upload_avatar
 #     if params[:avatar].present?
@@ -19,7 +19,7 @@
 #     end
 #   end
 
-#   # rubocop:disable Style/SymbolArray
+#
 #   def update
 #     if current_user.update(user_params)
 #       render json: {
@@ -32,9 +32,7 @@
 #       render json: { errors: current_user.errors.full_messages }, status: :unprocessable_entity
 #     end
 #   end
-#   # rubocop:enable Style/SymbolArray
-
-#   private
+#   #   private
 
 #   def user_params
 #     params.require(:user).permit(
@@ -44,12 +42,12 @@
 # end
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :authorize_admin!, only: [:create, :index, :destroy, :admin_update]
-  skip_before_action :verify_authenticity_token, only: [:create, :update, :upload_avatar, :destroy, :admin_update]
+  before_action :authorize_admin!, only: %i[create index destroy admin_update]
+  skip_before_action :verify_authenticity_token, only: %i[create update upload_avatar destroy admin_update]
 
   def index
     users = User.all
-    render json: users.as_json(only: [:id, :email, :first_name, :last_name, :country, :mobile_number, :role])
+    render json: users.as_json(only: %i[id email first_name last_name country mobile_number role])
   end
 
   def create
@@ -58,7 +56,7 @@ class UsersController < ApplicationController
       user.send_confirmation_instructions unless user.confirmed?
       render json: {
         message: 'User created successfully',
-        user: user.as_json(only: [:id, :email, :first_name, :last_name, :role])
+        user: user.as_json(only: %i[id email first_name last_name role])
       }, status: :created
     else
       render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
@@ -73,9 +71,9 @@ class UsersController < ApplicationController
     end
 
     if user.destroy
-      render json: { message: "User deleted successfully" }, status: :ok
+      render json: { message: 'User deleted successfully' }, status: :ok
     else
-      render json: { error: "Failed to delete user" }, status: :unprocessable_entity
+      render json: { error: 'Failed to delete user' }, status: :unprocessable_entity
     end
   end
 
@@ -83,9 +81,9 @@ class UsersController < ApplicationController
     if current_user.update(user_params)
       render json: {
         message: 'User updated successfully',
-        user: current_user.as_json(only: [
-          :id, :first_name, :last_name, :email, :country, :mobile_number, :unconfirmed_email, :role
-        ])
+        user: current_user.as_json(only: %i[
+                                     id first_name last_name email country mobile_number unconfirmed_email role
+                                   ])
       }, status: :ok
     else
       render json: { errors: current_user.errors.full_messages }, status: :unprocessable_entity
@@ -103,9 +101,9 @@ class UsersController < ApplicationController
     if user.update(user_params)
       render json: {
         message: 'User updated successfully',
-        user: user.as_json(only: [
-          :id, :first_name, :last_name, :email, :country, :mobile_number, :unconfirmed_email, :role
-        ])
+        user: user.as_json(only: %i[
+                             id first_name last_name email country mobile_number unconfirmed_email role
+                           ])
       }, status: :ok
     else
       render json: { errors: user.errors.full_messages }, status: :unprocessable_entity

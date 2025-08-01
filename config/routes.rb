@@ -22,7 +22,6 @@ Rails.application.routes.draw do
   delete '/users/:id', to: 'users#destroy'
   put '/admin/users/:id', to: 'users#admin_update'
 
-
   resources :courses do
     member do
       patch :upload_image  # matches controller action name and HTTP verb
