@@ -28,4 +28,8 @@ Rails.application.routes.draw do
     end
   end
   resources :instructors, only: %i[index show create update destroy]
+
+  post '/payments/create_payment_intent', to: 'payments#create_payment_intent'
+  post '/payments/confirm', to: 'payments#confirm'
+  post '/payments/webhook', to: 'payments#webhook'
 end

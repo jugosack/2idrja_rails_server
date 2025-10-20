@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_07_06_200118) do
+ActiveRecord::Schema[7.0].define(version: 2025_10_19_192110) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -63,6 +63,16 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_06_200118) do
     t.index ["user_id"], name: "index_courses_on_user_id"
   end
 
+  create_table "enrollments", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id", "user_id"], name: "index_enrollments_on_course_id_and_user_id", unique: true
+    t.index ["course_id"], name: "index_enrollments_on_course_id"
+    t.index ["user_id"], name: "index_enrollments_on_user_id"
+  end
+
   create_table "instructors", force: :cascade do |t|
     t.string "first_name", null: false
     t.string "last_name", null: false
@@ -72,6 +82,19 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_06_200118) do
     t.string "email", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "course_id", null: false
+    t.integer "amount"
+    t.string "currency"
+    t.string "stripe_payment_intent_id"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_payments_on_course_id"
+    t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -102,4 +125,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_06_200118) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "courses", "users"
+  add_foreign_key "enrollments", "courses"
+  add_foreign_key "enrollments", "users"
+  add_foreign_key "payments", "courses"
+  add_foreign_key "payments", "users"
 end

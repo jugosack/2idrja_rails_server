@@ -1,6 +1,9 @@
 class Course < ApplicationRecord
   belongs_to :user
   has_one_attached :image, dependent: :purge_later
+
+  has_many :enrollments
+  has_many :students, through: :enrollments, source: :user
   # Validations
   validates :course_name, presence: true
   validates :general_description, presence: true
