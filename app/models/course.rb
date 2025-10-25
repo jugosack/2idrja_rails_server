@@ -21,8 +21,6 @@ class Course < ApplicationRecord
 
   before_validation :calculate_places_left
 
- 
-
   def calculate_places_left
     return unless max_students.present? && enrolled_students.present?
 
