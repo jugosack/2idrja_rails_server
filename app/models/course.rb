@@ -21,14 +21,14 @@ class Course < ApplicationRecord
 
   before_validation :calculate_places_left
 
-  private
-
   def calculate_places_left
     return unless max_students.present? && enrolled_students.present?
 
     self.places_left = max_students - enrolled_students
     self.places_left = 0 if places_left.negative?
   end
+
+  private
 
   def user_must_be_admin
     return if user&.admin?
