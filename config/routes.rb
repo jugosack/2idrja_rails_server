@@ -32,4 +32,7 @@ Rails.application.routes.draw do
   post '/payments/create_payment_intent', to: 'payments#create_payment_intent'
   post '/payments/confirm', to: 'payments#confirm'
   post '/payments/webhook', to: 'payments#webhook'
+
+  get '/users/:user_id/enrolled_courses', to: 'courses#enrolled_courses'
+
 end
