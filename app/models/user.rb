@@ -14,6 +14,9 @@ class User < ApplicationRecord
   has_one_attached :avatar
   has_many :courses
 
+  has_many :enrollments, dependent: :destroy
+  has_many :enrolled_courses, through: :enrollments, source: :course
+
   enum role: { user: 'user', admin: 'admin' }
 
   before_validation :set_default_role, on: :create
