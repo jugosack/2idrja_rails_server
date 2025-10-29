@@ -72,20 +72,20 @@ class CoursesController < ApplicationController
   end
 
   # GET /users/:user_id/enrolled_courses
-def enrolled_courses
-  user = User.find(params[:user_id])
-  enrollments = user.enrollments.includes(:course)
+  def enrolled_courses
+    user = User.find(params[:user_id])
+    enrollments = user.enrollments.includes(:course)
 
-  courses = enrollments.map do |enrollment|
-    course_data = CourseSerializer.new(enrollment.course).serializable_hash[:data][:attributes]
-    course_data.merge({
-      enrollment_id: enrollment.id,
-      enrolled_at: enrollment.created_at
-    })
+    courses = enrollments.map do |enrollment|
+      course_data = CourseSerializer.new(enrollment.course).serializable_hash[:data][:attributes]
+      course_data.merge({
+                          enrollment_id: enrollment.id,
+                          enrolled_at: enrollment.created_at
+                        })
+    end
+
+    render json: courses
   end
-
-  render json: courses
-end
 
   private
 

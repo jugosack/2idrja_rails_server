@@ -5,24 +5,22 @@ class PaymentsController < ApplicationController
     course_id = params[:course_id]
     student_id = params[:student_id]
     amount = params[:amount].to_i
-  
+
     # 1️⃣ Check if user is already enrolled in the course
     if Enrollment.exists?(course_id: course_id, user_id: student_id)
       return render json: { error: 'You are already enrolled in this course.' }, status: :unprocessable_entity
     end
-  
+
     # 2️⃣ Check if user already has a pending or succeeded payment for this course
     existing_payment = Payment.find_by(course_id: course_id, user_id: student_id, status: %w[pending succeeded])
     if existing_payment
       return render json: { error: 'A payment for this course already exists or is being processed.' }, status: :unprocessable_entity
     end
-  
+
     # 3️⃣ Check if course has available spots
     course = Course.find(course_id)
-    if course.places_left <= 0
-      return render json: { error: 'Course is already full.' }, status: :unprocessable_entity
-    end
-  
+    return render json: { error: 'Course is already full.' }, status: :unprocessable_entity if course.places_left <= 0
+
     # 4️⃣ Create Stripe PaymentIntent
     payment_intent = Stripe::PaymentIntent.create(
       amount: amount,
@@ -32,7 +30,7 @@ class PaymentsController < ApplicationController
         student_id: student_id
       }
     )
-  
+
     # 5️⃣ Record new payment in DB
     Payment.create!(
       user_id: student_id,
@@ -42,12 +40,11 @@ class PaymentsController < ApplicationController
       stripe_payment_intent_id: payment_intent.id,
       status: 'pending'
     )
-  
+
     render json: { client_secret: payment_intent.client_secret }
   rescue StandardError => e
     render json: { error: e.message }, status: :unprocessable_entity
   end
-  
 
   # POST /payments/confirm
   def confirm
