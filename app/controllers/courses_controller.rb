@@ -28,11 +28,17 @@ class CoursesController < ApplicationController
   end
 
   def create
-    @course = current_user.courses.build(course_params)
-    if @course.save
-      render json: { message: 'Course created successfully', course: CourseSerializer.new(@course).serializable_hash[:data][:attributes] }
-    else
-      render json: { errors: @course.errors.full_messages }, status: :unprocessable_entity
+    begin
+      @course = current_user.courses.build(course_params)
+      if @course.save
+        render json: { message: 'Course created successfully', course: CourseSerializer.new(@course).serializable_hash[:data][:attributes] }
+      else
+        render json: { errors: @course.errors.full_messages }, status: :unprocessable_entity
+      end
+    rescue StandardError => e
+      Rails.logger.error "Course creation error: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      render json: { error: e.message, errors: [e.message] }, status: :internal_server_error
     end
   end
 
@@ -73,7 +79,14 @@ class CoursesController < ApplicationController
 
   # GET /users/:user_id/enrolled_courses
   def enrolled_courses
-    user = User.find(params[:user_id])
+    # Ensure user can only see their own enrolled courses
+    user_id = params[:user_id].to_i
+    if current_user.id != user_id
+      render json: { error: 'Unauthorized' }, status: :forbidden
+      return
+    end
+
+    user = current_user
     enrollments = user.enrollments.includes(:course)
 
     courses = enrollments.map do |enrollment|

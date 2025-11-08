@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal" created-in="RM-251.27812.51">
+    <data-source name="2idrja_rails_server: production" uuid="0f29d0a7-c428-452b-b78e-388470fe6029">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" />
+      <user-name>skola</user-name>
+      <schema-mapping />
+    </data-source>
+    <data-source name="2idrja_rails_server: test" uuid="92505c74-9750-46c7-aac1-4a5e69851703">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" />
+      <user-name>postgres</user-name>
+      <schema-mapping />
+    </data-source>
+    <data-source name="2idrja_rails_server: development" uuid="68fa9487-562c-45ed-a173-79ef665247bf">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" />
+      <user-name>postgres</user-name>
+      <schema-mapping />
+    </data-source>
+  </component>
+</project>

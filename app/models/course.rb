@@ -15,7 +15,7 @@ class Course < ApplicationRecord
   enum course_status: { planned: 'planned', ongoing: 'ongoing', completed: 'completed', cancelled: 'cancelled' }, _prefix: true
 
   validates :course_status, presence: true
-  validates :rating, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 5 }, allow_nil: true
+  validates :rating, numericality: { greater_than_or_equal_to: 0.1, less_than_or_equal_to: 5 }, allow_nil: true
 
   validate :user_must_be_admin
 

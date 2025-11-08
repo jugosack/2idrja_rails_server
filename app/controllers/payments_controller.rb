@@ -6,13 +6,19 @@ class PaymentsController < ApplicationController
     student_id = params[:student_id]
     amount = params[:amount].to_i
 
-    # 1️⃣ Check if user is already enrolled in the course
-    if Enrollment.exists?(course_id: course_id, user_id: student_id)
+    # Security: Verify that student_id matches the logged-in user
+    unless current_user && current_user.id.to_s == student_id.to_s
+      Rails.logger.warn "Payment intent creation: user_id mismatch. Current user: #{current_user&.id}, Provided student_id: #{student_id}"
+      return render json: { error: 'Unauthorized: You can only create payments for yourself' }, status: :forbidden
+    end
+
+    # 1️⃣ Check if user is already enrolled in the course (use current_user.id for security)
+    if Enrollment.exists?(course_id: course_id, user_id: current_user.id)
       return render json: { error: 'You are already enrolled in this course.' }, status: :unprocessable_entity
     end
 
-    # 2️⃣ Check if user already has a pending or succeeded payment for this course
-    existing_payment = Payment.find_by(course_id: course_id, user_id: student_id, status: %w[pending succeeded])
+    # 2️⃣ Check if user already has a pending or succeeded payment for this course (use current_user.id for security)
+    existing_payment = Payment.find_by(course_id: course_id, user_id: current_user.id, status: %w[pending succeeded])
     if existing_payment
       return render json: { error: 'A payment for this course already exists or is being processed.' }, status: :unprocessable_entity
     end
@@ -31,9 +37,9 @@ class PaymentsController < ApplicationController
       }
     )
 
-    # 5️⃣ Record new payment in DB
+    # 5️⃣ Record new payment in DB (use current_user.id for security)
     Payment.create!(
-      user_id: student_id,
+      user_id: current_user.id,
       course_id: course_id,
       amount: amount,
       currency: 'usd',
@@ -48,16 +54,79 @@ class PaymentsController < ApplicationController
 
   # POST /payments/confirm
   def confirm
-    course = Course.find(params[:course_id])
-    student = User.find(params[:student_id])
+    course_id = params[:course_id]
+    student_id = params[:student_id]
 
-    return render json: { error: 'Course is already full' }, status: :unprocessable_entity if course.places_left <= 0
+    begin
+      # Security: Verify that student_id matches the logged-in user
+      unless current_user && current_user.id.to_s == student_id.to_s
+        Rails.logger.warn "Enrollment attempt: user_id mismatch. Current user: #{current_user&.id}, Provided student_id: #{student_id}"
+        return render json: { error: 'Unauthorized: You can only enroll as yourself' }, status: :forbidden
+      end
 
-    enrollment = Enrollment.new(course: course, user: student)
-    if enrollment.save
-      render json: { message: 'Payment confirmed and student enrolled successfully!' }, status: :ok
-    else
-      render json: { error: enrollment.errors.full_messages }, status: :unprocessable_entity
+      course = Course.find(course_id)
+      student = current_user # Use current_user instead of finding by student_id
+
+      # Check if course is full
+      if course.places_left <= 0
+        return render json: { error: 'Course is already full' }, status: :unprocessable_entity
+      end
+
+      # Check if already enrolled (use current_user.id for security)
+      existing_enrollment = Enrollment.find_by(course_id: course_id, user_id: current_user.id)
+      if existing_enrollment
+        # Already enrolled, but still update payment status
+        payment = Payment.find_by(course_id: course_id, user_id: current_user.id, status: 'pending')
+        payment&.update!(status: 'succeeded')
+        Rails.logger.info "User #{current_user.id} already enrolled in course #{course_id}"
+        return render json: { 
+          message: 'Already enrolled in this course',
+          enrollment: {
+            id: existing_enrollment.id,
+            course_id: existing_enrollment.course_id,
+            user_id: existing_enrollment.user_id
+          }
+        }, status: :ok
+      end
+
+      # Create new enrollment (use current_user for security)
+      enrollment = Enrollment.new(course: course, user: current_user)
+      
+      if enrollment.save
+        Rails.logger.info "Successfully created enrollment: user_id=#{current_user.id}, course_id=#{course_id}, enrollment_id=#{enrollment.id}"
+        
+        # Update payment status to succeeded (use current_user.id for security)
+        payment = Payment.find_by(course_id: course_id, user_id: current_user.id, status: 'pending')
+        if payment
+          payment.update!(status: 'succeeded')
+          Rails.logger.info "Updated payment status to succeeded for payment_id=#{payment.id}"
+        else
+          # Payment might not exist, create it for record keeping
+          Rails.logger.warn "Payment record not found for course_id: #{course_id}, user_id: #{current_user.id}"
+        end
+
+        render json: { 
+          message: 'Payment confirmed and student enrolled successfully!',
+          enrollment: {
+            id: enrollment.id,
+            course_id: enrollment.course_id,
+            user_id: enrollment.user_id,
+            created_at: enrollment.created_at
+          }
+        }, status: :ok
+      else
+        Rails.logger.error "Failed to create enrollment: #{enrollment.errors.full_messages.join(', ')}"
+        render json: { 
+          error: 'Failed to create enrollment',
+          errors: enrollment.errors.full_messages 
+        }, status: :unprocessable_entity
+      end
+    rescue ActiveRecord::RecordNotFound => e
+      render json: { error: "Record not found: #{e.message}" }, status: :not_found
+    rescue StandardError => e
+      Rails.logger.error "Enrollment confirmation error: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      render json: { error: e.message }, status: :internal_server_error
     end
   end
 
