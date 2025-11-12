@@ -73,8 +73,16 @@ class CoursesController < ApplicationController
 
   # DELETE /courses/:id
   def destroy
-    @course.destroy
-    render json: { message: 'Course deleted successfully' }, status: :ok
+         if @course.destroy
+        render json: { message: 'Course deleted successfully' }, status: :ok
+      else
+        render json: { errors: @course.errors.full_messages }, status: :unprocessable_entity
+      end
+    rescue StandardError => e
+      Rails.logger.error "Course deletion error: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      render json: { error: e.message, errors: [e.message] }, status: :internal_server_error
+    end
   end
 
   # GET /users/:user_id/enrolled_courses
