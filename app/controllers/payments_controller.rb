@@ -65,12 +65,10 @@ class PaymentsController < ApplicationController
       end
 
       course = Course.find(course_id)
-      student = current_user # Use current_user instead of finding by student_id
+      current_user # Use current_user instead of finding by student_id
 
       # Check if course is full
-      if course.places_left <= 0
-        return render json: { error: 'Course is already full' }, status: :unprocessable_entity
-      end
+      return render json: { error: 'Course is already full' }, status: :unprocessable_entity if course.places_left <= 0
 
       # Check if already enrolled (use current_user.id for security)
       existing_enrollment = Enrollment.find_by(course_id: course_id, user_id: current_user.id)
@@ -79,7 +77,7 @@ class PaymentsController < ApplicationController
         payment = Payment.find_by(course_id: course_id, user_id: current_user.id, status: 'pending')
         payment&.update!(status: 'succeeded')
         Rails.logger.info "User #{current_user.id} already enrolled in course #{course_id}"
-        return render json: { 
+        return render json: {
           message: 'Already enrolled in this course',
           enrollment: {
             id: existing_enrollment.id,
@@ -91,10 +89,10 @@ class PaymentsController < ApplicationController
 
       # Create new enrollment (use current_user for security)
       enrollment = Enrollment.new(course: course, user: current_user)
-      
+
       if enrollment.save
         Rails.logger.info "Successfully created enrollment: user_id=#{current_user.id}, course_id=#{course_id}, enrollment_id=#{enrollment.id}"
-        
+
         # Update payment status to succeeded (use current_user.id for security)
         payment = Payment.find_by(course_id: course_id, user_id: current_user.id, status: 'pending')
         if payment
@@ -105,7 +103,7 @@ class PaymentsController < ApplicationController
           Rails.logger.warn "Payment record not found for course_id: #{course_id}, user_id: #{current_user.id}"
         end
 
-        render json: { 
+        render json: {
           message: 'Payment confirmed and student enrolled successfully!',
           enrollment: {
             id: enrollment.id,
@@ -116,9 +114,9 @@ class PaymentsController < ApplicationController
         }, status: :ok
       else
         Rails.logger.error "Failed to create enrollment: #{enrollment.errors.full_messages.join(', ')}"
-        render json: { 
+        render json: {
           error: 'Failed to create enrollment',
-          errors: enrollment.errors.full_messages 
+          errors: enrollment.errors.full_messages
         }, status: :unprocessable_entity
       end
     rescue ActiveRecord::RecordNotFound => e
