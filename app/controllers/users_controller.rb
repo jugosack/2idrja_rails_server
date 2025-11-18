@@ -51,9 +51,16 @@ class UsersController < ApplicationController
   end
 
   def create
-    user = User.new(user_create_params)
+    user_params = user_create_params.to_h
+    user_params[:terms_of_use] = true if user_params[:terms_of_use].blank?
+    user = User.new(user_params)
+    
     if user.save
-      user.send_confirmation_instructions unless user.confirmed?
+      begin
+        user.send_confirmation_instructions unless user.confirmed?
+      rescue StandardError => e
+        Rails.logger.error "Failed to send confirmation email: #{e.message}"
+      end
       render json: {
         message: 'User created successfully',
         user: user.as_json(only: %i[id email first_name last_name role])
@@ -138,7 +145,7 @@ class UsersController < ApplicationController
   def user_create_params
     params.require(:user).permit(
       :email, :password, :password_confirmation,
-      :first_name, :last_name, :country, :mobile_number, :role
+      :first_name, :last_name, :country, :mobile_number, :role, :terms_of_use
     )
   end
 

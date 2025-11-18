@@ -8,7 +8,7 @@ class User < ApplicationRecord
   validates :last_name, presence: true
   validates :country, presence: true
   validates :mobile_number, presence: true
-  validates :terms_of_use, acceptance: true
+  validates :terms_of_use, acceptance: true, on: :create
 
   # attr_accessor :unconfirmed_email
   has_one_attached :avatar

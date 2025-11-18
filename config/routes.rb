@@ -19,6 +19,7 @@ Rails.application.routes.draw do
 
   post '/create_user', to: 'users#create'
   get '/users', to: 'users#index'
+  put '/users/:id', to: 'users#admin_update'
   delete '/users/:id', to: 'users#destroy'
   put '/admin/users/:id', to: 'users#admin_update'
 
