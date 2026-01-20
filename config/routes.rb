@@ -37,5 +37,5 @@ Rails.application.routes.draw do
 
   get '/users/:user_id/enrolled_courses', to: 'courses#enrolled_courses'
 
-  resources :reviews, only: [:create, :index]
+  resources :reviews, only: %i[create index]
 end

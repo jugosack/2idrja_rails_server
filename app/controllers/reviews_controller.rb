@@ -12,10 +12,10 @@ class ReviewsController < ApplicationController
 
     render json: reviews.map { |review|
       review.as_json.merge(
-        user: review.user.as_json(only: [:id, :first_name, :last_name]).merge(
+        user: review.user.as_json(only: %i[id first_name last_name]).merge(
           avatar_url: review.user.avatar.attached? ? url_for(review.user.avatar) : nil
         ),
-        course: review.course.as_json(only: [:id, :course_name])
+        course: review.course.as_json(only: %i[id course_name])
       )
     }
   end
@@ -40,7 +40,7 @@ class ReviewsController < ApplicationController
       :title,
       :body,
       :rating,
-      flags: [:structured, :engaging, :knowledgeable]
+      flags: %i[structured engaging knowledgeable]
     )
   end
 

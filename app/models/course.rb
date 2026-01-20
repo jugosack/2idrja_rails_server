@@ -5,7 +5,7 @@ class Course < ApplicationRecord
   has_many :enrollments, dependent: :destroy
   has_many :payments, dependent: :destroy
   has_many :reviews, dependent: :destroy
-  
+
   # Validations
   validates :course_name, presence: true
   validates :general_description, presence: true

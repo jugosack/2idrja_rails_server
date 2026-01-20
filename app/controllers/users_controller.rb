@@ -53,25 +53,25 @@ class UsersController < ApplicationController
   def create
     user_params = user_create_params.to_h
     user_params[:terms_of_use] = true if user_params[:terms_of_use].blank?
-    
+
     # Validate password and password_confirmation match
     if user_params[:password] != user_params[:password_confirmation]
       return render json: { errors: ['Password and password confirmation do not match'] }, status: :unprocessable_entity
     end
-    
+
     # Extract password separately to ensure it's set correctly
     password = user_params.delete(:password)
     password_confirmation = user_params.delete(:password_confirmation)
-    
+
     user = User.new(user_params)
     # Explicitly set password to ensure Devise encrypts it
     user.password = password
     user.password_confirmation = password_confirmation
-    
+
     if user.save
       # Automatically confirm user when created by admin so they can login immediately
       user.confirm unless user.confirmed?
-      
+
       render json: {
         message: 'User created successfully',
         user: user.as_json(only: %i[id email first_name last_name role])
