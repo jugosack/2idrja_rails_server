@@ -13,6 +13,7 @@ class User < ApplicationRecord
   # attr_accessor :unconfirmed_email
   has_one_attached :avatar
   has_many :courses
+  has_many :reviews, dependent: :destroy
 
   has_many :enrollments, dependent: :destroy
   has_many :enrolled_courses, through: :enrollments, source: :course

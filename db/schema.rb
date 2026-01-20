@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_10_19_192110) do
+ActiveRecord::Schema[7.0].define(version: 2026_01_18_131240) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -97,6 +97,20 @@ ActiveRecord::Schema[7.0].define(version: 2025_10_19_192110) do
     t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
+  create_table "reviews", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "course_id", null: false
+    t.string "title"
+    t.text "body", null: false
+    t.integer "rating", null: false
+    t.jsonb "flags", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_reviews_on_course_id"
+    t.index ["flags"], name: "index_reviews_on_flags", using: :gin
+    t.index ["user_id"], name: "index_reviews_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -129,4 +143,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_10_19_192110) do
   add_foreign_key "enrollments", "users"
   add_foreign_key "payments", "courses"
   add_foreign_key "payments", "users"
+  add_foreign_key "reviews", "courses"
+  add_foreign_key "reviews", "users"
 end
