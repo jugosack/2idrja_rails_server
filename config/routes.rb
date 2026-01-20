@@ -36,4 +36,6 @@ Rails.application.routes.draw do
   post '/payments/webhook', to: 'payments#webhook'
 
   get '/users/:user_id/enrolled_courses', to: 'courses#enrolled_courses'
+
+  resources :reviews, only: [:create, :index]
 end
