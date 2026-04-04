@@ -4,6 +4,7 @@ class Enrollment < ApplicationRecord
 
   validates :user_id, uniqueness: { scope: :course_id, message: 'is already enrolled in this course' }
   after_create :update_course_places_left
+  after_commit :send_enrollment_email, on: :create
 
   validate :course_not_full
 
@@ -12,6 +13,11 @@ class Enrollment < ApplicationRecord
   def update_course_places_left
     course.calculate_places_left
     course.save!
+  end
+
+  def send_enrollment_email
+    EnrollmentMailer.enrollment_confirmation(self).deliver_later
+    EnrollmentMailer.admin_notification(self).deliver_later
   end
 
   def course_not_full

@@ -1,0 +1,15 @@
+<h2>New Enrollment</h2>
+
+<p>
+  <strong>User:</strong>
+  <%= @user.first_name %> <%= @user.last_name %> (<%= @user.email %>)
+</p>
+
+<p>
+  <strong>Course:</strong>
+  <%= @course.course_name %>
+</p>
+<p>
+<strong>Start date:</strong> <%= @course.start_date %>
+</p>
+<p><strong>Fee:</strong> <%= @course.fee %> €</p>
