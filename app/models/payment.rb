@@ -6,9 +6,9 @@ class Payment < ApplicationRecord
   validates :stripe_payment_intent_id, presence: true, uniqueness: true
   validates :status, inclusion: { in: %w[pending succeeded failed] }
 
-  enum status: {
+  enum :status, {
     pending: 'pending',
     succeeded: 'succeeded',
     failed: 'failed'
-  }, _prefix: true
+  }, prefix: true
 end

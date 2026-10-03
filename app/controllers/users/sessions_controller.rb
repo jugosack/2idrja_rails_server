@@ -1,5 +1,7 @@
 class Users::SessionsController < Devise::SessionsController
   include RackSessionFix
+
+  # rubocop:disable-next Rails/LexicallyScopedActionFilter
   before_action :authenticate_user_from_token!, only: [:destroy]
 
   skip_before_action :verify_authenticity_token

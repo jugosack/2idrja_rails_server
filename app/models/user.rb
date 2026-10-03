@@ -10,15 +10,22 @@ class User < ApplicationRecord
   validates :mobile_number, presence: true
   validates :terms_of_use, acceptance: true
 
+  has_many :conversations, through: :conversation_participants
+  has_many :conversation_participants,
+           dependent: :destroy,
+           inverse_of: :user
+
+  has_many :messages, dependent: :destroy
   # attr_accessor :unconfirmed_email
   has_one_attached :avatar
+  # rubocop:disable-next Rails/HasManyOrHasOneDependent
   has_many :courses
   has_many :reviews, dependent: :destroy
 
   has_many :enrollments, dependent: :destroy
   has_many :enrolled_courses, through: :enrollments, source: :course
 
-  enum role: { user: 'user', admin: 'admin' }
+  enum :role, { user: 'user', admin: 'admin' }
 
   before_validation :set_default_role, on: :create
 

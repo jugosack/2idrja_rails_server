@@ -27,6 +27,9 @@ class CoursesController < ApplicationController
     @course = Course.new
   end
 
+  # GET /courses/:id/edit
+  def edit; end
+
   def create
     @course = current_user.courses.build(course_params)
     if @course.save
@@ -65,9 +68,6 @@ class CoursesController < ApplicationController
       render json: { error: 'No image provided' }, status: :bad_request
     end
   end
-
-  # GET /courses/:id/edit
-  def edit; end
 
   # DELETE /courses/:id
   def destroy
