@@ -55,9 +55,7 @@ class UsersController < ApplicationController
     user_params[:terms_of_use] = true if user_params[:terms_of_use].blank?
 
     # Validate password and password_confirmation match
-    if user_params[:password] != user_params[:password_confirmation]
-      return render json: { errors: ['Password and password confirmation do not match'] }, status: :unprocessable_entity
-    end
+    return render json: { errors: ['Password and password confirmation do not match'] }, status: :unprocessable_entity if user_params[:password] != user_params[:password_confirmation]
 
     # Extract password separately to ensure it's set correctly
     password = user_params.delete(:password)
@@ -81,6 +79,19 @@ class UsersController < ApplicationController
     end
   end
 
+  def update
+    if current_user.update(user_params)
+      render json: {
+        message: 'User updated successfully',
+        user: current_user.as_json(only: %i[
+                                     id first_name last_name email country mobile_number unconfirmed_email role
+                                   ])
+      }, status: :ok
+    else
+      render json: { errors: current_user.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   def destroy
     user = User.find_by(id: params[:id])
     if user.nil?
@@ -92,19 +103,6 @@ class UsersController < ApplicationController
       render json: { message: 'User deleted successfully' }, status: :ok
     else
       render json: { error: 'Failed to delete user' }, status: :unprocessable_entity
-    end
-  end
-
-  def update
-    if current_user.update(user_params)
-      render json: {
-        message: 'User updated successfully',
-        user: current_user.as_json(only: %i[
-                                     id first_name last_name email country mobile_number unconfirmed_email role
-                                   ])
-      }, status: :ok
-    else
-      render json: { errors: current_user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 

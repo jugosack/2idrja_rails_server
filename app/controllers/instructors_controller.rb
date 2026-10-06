@@ -3,7 +3,7 @@ class InstructorsController < ApplicationController
 
   skip_before_action :authenticate_user_from_token!, only: %i[index show]
 
-  before_action :authenticate_user!  # Devise authentication
+  before_action :authenticate_user! # Devise authentication
   before_action :authorize_admin!, only: %i[create update destroy]
   before_action :set_instructor, only: %i[show update destroy]
 

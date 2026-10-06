@@ -1,6 +1,7 @@
 # app/controllers/concerns/rack_session_fix.rb
 module RackSessionFix
   extend ActiveSupport::Concern
+
   class FakeRackSession < Hash
     def enabled?
       false

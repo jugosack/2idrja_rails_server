@@ -24,9 +24,20 @@ Rails.application.routes.draw do
 
   resources :courses do
     member do
-      patch :upload_image  # matches controller action name and HTTP verb
+      patch :upload_image # matches controller action name and HTTP verb
+    end
+
+    resources :conversations, only: [:index] do
+      collection do
+        post :private
+      end
     end
   end
+
+  resources :conversations, only: [:show] do
+    resources :messages, only: %i[index create destroy update]
+  end
+
   resources :instructors, only: %i[index show create update destroy]
 
   resources :enrollments, only: [:create]

@@ -12,9 +12,7 @@ class PasswordsController < ApplicationController
       return render json: { error: 'Current password is incorrect' }, status: :unauthorized
     end
 
-    if permitted[:new_password] != permitted[:new_password_confirmation]
-      return render json: { error: 'Password confirmation does not match' }, status: :unprocessable_entity
-    end
+    return render json: { error: 'Password confirmation does not match' }, status: :unprocessable_entity if permitted[:new_password] != permitted[:new_password_confirmation]
 
     if user.update(password: permitted[:new_password])
       render json: { message: 'Password updated successfully' }, status: :ok

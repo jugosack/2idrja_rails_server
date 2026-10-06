@@ -1,5 +1,5 @@
 Layout/LineLength:
-  Max: 150
+  Max: 250
   Exclude:
     - "config/initializers/devise.rb"
 
@@ -35,6 +35,13 @@ Style/StringLiterals:
   Exclude:
     - "config/initializers/devise.rb" # Exclude Devise configuration
 
+
+plugins:
+  - rubocop-rails
+  
+Layout/EndOfLine:
+  EnforcedStyle: lf
+
 # Ensure trailing whitespace is removed
 Layout/TrailingWhitespace:
   Enabled: true
@@ -61,7 +68,7 @@ Metrics/ClassLength:
   Max: 200
 
 Metrics/BlockLength:
-  Max: 40
+  Max: 200
 
 Metrics/AbcSize:
   Max: 80

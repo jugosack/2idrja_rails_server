@@ -18,7 +18,7 @@ class EnrollmentMailer < ApplicationMailer
     @course = enrollment.course
 
     admins = User.where(role: 'admin').pluck(:email)
-    return if admins.empty?  # prevent errors if no admin exists
+    return if admins.empty? # prevent errors if no admin exists
 
     mail(
       to: admins,

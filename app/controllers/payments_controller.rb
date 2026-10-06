@@ -13,15 +13,11 @@ class PaymentsController < ApplicationController
     end
 
     # 1️⃣ Check if user is already enrolled in the course (use current_user.id for security)
-    if Enrollment.exists?(course_id: course_id, user_id: current_user.id)
-      return render json: { error: 'You are already enrolled in this course.' }, status: :unprocessable_entity
-    end
+    return render json: { error: 'You are already enrolled in this course.' }, status: :unprocessable_entity if Enrollment.exists?(course_id: course_id, user_id: current_user.id)
 
     # 2️⃣ Check if user already has a pending or succeeded payment for this course (use current_user.id for security)
     existing_payment = Payment.find_by(course_id: course_id, user_id: current_user.id, status: %w[pending succeeded])
-    if existing_payment
-      return render json: { error: 'A payment for this course already exists or is being processed.' }, status: :unprocessable_entity
-    end
+    return render json: { error: 'A payment for this course already exists or is being processed.' }, status: :unprocessable_entity if existing_payment
 
     # 3️⃣ Check if course has available spots
     course = Course.find(course_id)
@@ -135,7 +131,7 @@ class PaymentsController < ApplicationController
     begin
       event = Stripe::Event.construct_from(JSON.parse(payload))
     rescue JSON::ParserError
-      return render json: { error: 'Invalid payload' }, status: 400
+      return render json: { error: 'Invalid payload' }, status: :bad_request
     end
 
     if event.type == 'payment_intent.succeeded'
